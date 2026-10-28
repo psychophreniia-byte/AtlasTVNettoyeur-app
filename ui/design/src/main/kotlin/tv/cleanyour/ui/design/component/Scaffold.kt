@@ -72,7 +72,12 @@ fun ScreenScaffold(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val c = CytTheme.colors
-    BoxWithConstraints(modifier.fillMaxSize().background(c.bg).animatedAmbientGlow(glow)) {
+    BoxWithConstraints(
+        modifier.fillMaxSize()
+            .background(c.bg)
+            .atlasGeometry(c.primary, c.accent)
+            .animatedAmbientGlow(glow),
+    ) {
         val gutter = CytSpacing.gutterFor(maxWidth)
         Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
             topBar()
@@ -90,6 +95,33 @@ fun ScreenScaffold(
             }
         }
         overlay()
+    }
+}
+
+// Purely decorative Moroccan geometry. It is drawn behind the existing UI and never handles input,
+// so navigation, ADB behaviour, device selection and cleanup logic remain untouched.
+private fun Modifier.atlasGeometry(primary: Color, accent: Color): Modifier = drawWithCache {
+    val unit = 22.dp.toPx()
+    val stroke = 1.dp.toPx()
+    val red = primary.copy(alpha = 0.13f)
+    val green = accent.copy(alpha = 0.07f)
+
+    onDrawBehind {
+        fun line(color: Color, a: Offset, b: Offset) = drawLine(color, a, b, strokeWidth = stroke)
+
+        // Top-left: layered diamond/zellige linework.
+        line(red, Offset(0f, unit * 1.5f), Offset(unit * 1.5f, 0f))
+        line(red, Offset(0f, unit * 3.2f), Offset(unit * 3.2f, 0f))
+        line(green, Offset(unit * 0.8f, unit * 3.2f), Offset(unit * 3.2f, unit * 0.8f))
+        line(red, Offset(unit * 1.6f, 0f), Offset(unit * 3.2f, unit * 1.6f))
+
+        // Bottom-right: mirrored motif, deliberately subtle so content stays dominant.
+        val w = size.width
+        val h = size.height
+        line(red, Offset(w, h - unit * 1.5f), Offset(w - unit * 1.5f, h))
+        line(red, Offset(w, h - unit * 3.2f), Offset(w - unit * 3.2f, h))
+        line(green, Offset(w - unit * 0.8f, h - unit * 3.2f), Offset(w - unit * 3.2f, h - unit * 0.8f))
+        line(red, Offset(w - unit * 1.6f, h), Offset(w - unit * 3.2f, h - unit * 1.6f))
     }
 }
 
