@@ -26,11 +26,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Verify launcher pins
-        run: bash scripts/verify-launcher-pins.sh
+      - name: Verify launcher and curtain pins
+        run: ./gradlew :core:trust:verifyLauncherPin :core:trust:verifyCurtainPin --console=plain
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug
+        run: ./gradlew :app:assembleDebug --console=plain
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
